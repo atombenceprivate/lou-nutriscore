@@ -1,6 +1,6 @@
 {
   "name": "lou-nutriscore",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A configurable, explainable scoring engine with an optional Lou+ presentation preset.",
   "license": "MIT",
   "repository": {
@@ -17,6 +17,9 @@
   "exports": {
     ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
     "./lou": { "types": "./dist/lou.d.ts", "import": "./dist/lou.js" }
+  },
+  "bin": {
+    "lou-nutriscore": "./dist/cli.js"
   },
   "files": ["dist", "README.md", "LICENSE"],
   "sideEffects": false,
