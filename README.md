@@ -117,7 +117,14 @@ npx lou-nutriscore validate config.json
 npx lou-nutriscore score config.json input.json
 npx lou-nutriscore explain config.json input.json
 npx lou-nutriscore compare config.json first.json second.json
+npx lou-nutriscore lou --energy 10 --vibe 10 --chaos 0
 ```
+
+## Playground
+
+Open `playground/index.html` in a browser for a standalone, local demo with
+live score and comparison output. It intentionally sends no input data over the
+network.
 
 ## Extensions
 
