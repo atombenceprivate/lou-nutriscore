@@ -1,0 +1,34 @@
+{
+  "name": "lou-nutriscore",
+  "version": "0.1.0",
+  "description": "A configurable, explainable scoring engine with an optional Lou+ presentation preset.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atombenceprivate/lou-nutriscore.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atombenceprivate/lou-nutriscore/issues"
+  },
+  "homepage": "https://github.com/atombenceprivate/lou-nutriscore#readme",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./lou": { "types": "./dist/lou.d.ts", "import": "./dist/lou.js" }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && tsc -p tsconfig.test.json && node test-dist/engine.test.js",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": { "node": ">=18" },
+  "keywords": ["scoring", "calculator", "nutri-score", "typescript", "lou"]
+}
