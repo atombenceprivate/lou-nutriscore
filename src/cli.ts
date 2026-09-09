@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
 import { createCalculator, importPreset, validateConfig } from "./index.js";
+import { explainLou } from "./lou.js";
 
 const readJson = (path: string): unknown => JSON.parse(readFileSync(path, "utf8"));
 const [command, ...paths] = process.argv.slice(2);
 
 try {
   if (!command || command === "--help" || command === "-h") {
-    console.log("Usage: lou-nutriscore <score|explain|compare|validate> <config.json> [input.json] [other-input.json]");
+    console.log("Usage: lou-nutriscore <score|explain|compare|validate> <config.json> [input.json] [other-input.json] | lou --energy 10 --vibe 10 --chaos 0");
+  } else if (command === "lou") {
+    const values: Record<string, number> = {};
+    for (let index = 0; index < paths.length; index += 2) values[paths[index].replace(/^--/, "")] = Number(paths[index + 1]);
+    console.log(JSON.stringify(explainLou(values), null, 2));
   } else if (command === "validate") {
     validateConfig(importPreset(readFileSync(paths[0], "utf8")));
     console.log(JSON.stringify({ valid: true }));
