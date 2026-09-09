@@ -129,3 +129,11 @@ export interface PresetMigrationResult {
   toVersion: 1;
   migrated: boolean;
 }
+
+export interface RankedResult { input: ScoreInput; result: ScoreResult; rank: number; percentile: number; }
+export interface ScoreStatistics { count: number; mean: number; median: number; min: number; max: number; standardDeviation: number; grades: Record<string, number>; distribution: Record<string, number>; }
+export type DatasetNormalizationStrategy = "minMax" | "zScore" | "percentile";
+export interface Constraint { name: string; when: (input: Readonly<ScoreInput>, result: Readonly<ScoreResult>) => boolean; maxGrade?: string; failGrade?: string; message?: string; }
+export interface ConstraintResult { name: string; passed: boolean; message?: string; }
+export interface WeightSimulation { weights: Record<string, number>; results: ScoreResult[]; ranking: RankedResult[]; }
+export interface AuditEntry { step: "factor" | "score" | "grade" | "constraint"; data: Record<string, unknown>; }
