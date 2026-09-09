@@ -143,16 +143,34 @@ const roundScore: ScorePlugin = {
 const calculator = createCalculator(balancedPreset, { plugins: [roundScore] });
 ```
 
-## Lou+ (optional)
+## Lou+ (optional fan/parody layer)
 
 ```ts
-import { calculateLou, LOU_DISCLAIMER } from "lou-nutriscore/lou";
-const result = calculateLou({ energy: 9, vibe: 9, chaos: 1 });
+import {
+  calculateLou, compareLou, createLouShareCardData,
+  generateLouChallenge, getLouReaction, LOU_DISCLAIMER,
+} from "lou-nutriscore/lou";
+
+const result = calculateLou({ energy: 9, vibe: 9, chaos: 1 }, "en");
+const reaction = getLouReaction(result, "dramatic");
+const card = createLouShareCardData(result);
+const comparison = compareLou(
+  { energy: 8, vibe: 7, chaos: 3 },
+  { energy: 9, vibe: 9, chaos: 1 },
+);
+const challenge = generateLouChallenge({ energy: 7, vibe: 5, chaos: 4 }, "hu");
 ```
 
-`explainLou(input)` returns the same result together with Lou+-specific,
-playful presentation text. It uses the same serious breakdown engine as the
-core package.
+`calculateLou()` and `explainLou()` use the same core breakdown engine, then
+add optional presentation metadata. The playful grades are `LOU+`, `HIGH LOU`,
+`EXTREMELY LOU`, and `MAXIMUM LOU`. `result.badges` returns deterministic
+achievements such as Vibe elevation and Chaos tamer; `getLouReaction()` supports
+`default`, `dramatic`, and `deadpan` tones.
+
+`createLouShareCardData()` returns frontend-ready text, theme and disclaimer
+metadata without rendering an image. `compareLou()` keeps both structured score
+results and the numeric delta. `generateLouChallenge()` creates a deterministic,
+non-personal mini prompt in English or Hungarian.
 
 Lou+ is a fan/parody presentation preset, not a nutrition classification and
 not an official product, endorsement, or affiliation. Do not use it for health,
