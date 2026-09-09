@@ -15,8 +15,9 @@ export const louPreset: ScoreConfig = {
   grades: [{ name: "LOU+", min: 80 }, { name: "LOU", min: 60 }, { name: "warm-up", min: 0 }],
 };
 
-export interface LouResult extends ScoreResult { presentation: { title: string; disclaimer: string }; }
+export interface LouResult extends ScoreResult { presentation: { title: string; disclaimer: string; narrative: string }; }
 export function calculateLou(input: ScoreInput): LouResult {
   const result = createCalculator(louPreset).calculate(input);
-  return { ...result, presentation: { title: `${result.grade} · ${result.score.toFixed(0)}/100`, disclaimer: LOU_DISCLAIMER } };
+  return { ...result, presentation: { title: `${result.grade} · ${result.score.toFixed(0)}/100`, disclaimer: LOU_DISCLAIMER, narrative: `Energy, vibe and chaos combine into ${result.grade}.` } };
 }
+export function explainLou(input: ScoreInput): LouResult { return calculateLou(input); }
