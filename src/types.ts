@@ -1,4 +1,5 @@
 export type ScoreInput = Record<string, number | undefined>;
+export type MaybePromise<T> = T | Promise<T>;
 
 export interface Range {
   min: number;
@@ -17,11 +18,11 @@ export interface FactorDefinition {
   /** Keep normalized factor scores within 0…100. Defaults to true. */
   clamp?: boolean;
   /** Derive a raw value when a property lookup is not enough. */
-  evaluate?: (input: Readonly<ScoreInput>) => number;
+  evaluate?: (input: Readonly<ScoreInput>) => MaybePromise<number>;
   /** Transform a raw value before the built-in linear normalizer runs. */
-  transform?: (value: number, input: Readonly<ScoreInput>) => number;
+  transform?: (value: number, input: Readonly<ScoreInput>) => MaybePromise<number>;
   /** Replace the built-in normalizer. Must return a score on the 0…100 scale. */
-  normalize?: (value: number, factor: Readonly<FactorDefinition>) => number;
+  normalize?: (value: number, factor: Readonly<FactorDefinition>) => MaybePromise<number>;
 }
 
 export interface GradeDefinition {
@@ -59,9 +60,9 @@ export interface ScoreResult {
 
 export interface ScorePlugin {
   name: string;
-  beforeCalculate?: (input: Readonly<ScoreInput>) => ScoreInput | void;
-  afterCalculate?: (result: Readonly<ScoreResult>) => ScoreResult | void;
-  resolveGrade?: (score: number, config: Readonly<ScoreConfig>) => GradeDefinition | void;
+  beforeCalculate?: (input: Readonly<ScoreInput>) => MaybePromise<ScoreInput | void>;
+  afterCalculate?: (result: Readonly<ScoreResult>) => MaybePromise<ScoreResult | void>;
+  resolveGrade?: (score: number, config: Readonly<ScoreConfig>) => MaybePromise<GradeDefinition | void>;
 }
 
 export interface CalculatorOptions {
@@ -73,4 +74,58 @@ export interface Calculator {
   readonly config: Readonly<ScoreConfig>;
   calculate(input: ScoreInput): ScoreResult;
   explain(input: ScoreInput): ScoreResult;
+  calculateMany(inputs: readonly ScoreInput[]): ScoreResult[];
+  calculateAsync(input: ScoreInput): Promise<ScoreResult>;
+  calculateManyAsync(inputs: readonly ScoreInput[]): Promise<ScoreResult[]>;
+  compare(a: ScoreInput, b: ScoreInput): ScoreComparison;
+  sensitivity(input: ScoreInput, step?: number): SensitivityResult;
+  analyze(input: ScoreInput, step?: number): SensitivityResult;
+}
+
+export interface FactorComparison {
+  key: string;
+  a: number | undefined;
+  b: number | undefined;
+  delta: number;
+}
+
+export interface ScoreComparison {
+  a: ScoreResult;
+  b: ScoreResult;
+  scoreDelta: number;
+  winner: "a" | "b" | "tie";
+  factors: FactorComparison[];
+}
+
+export interface SensitivityItem {
+  key: string;
+  step: number;
+  baseline: number;
+  increasedScore?: number;
+  decreasedScore?: number;
+  increaseDelta?: number;
+  decreaseDelta?: number;
+  unavailableReason?: string;
+}
+
+export interface SensitivityResult {
+  baseline: ScoreResult;
+  factors: SensitivityItem[];
+}
+
+export interface CompositeCalculator {
+  calculate(input: ScoreInput, childInputs: Record<string, ScoreInput>): CompositeScoreResult;
+  calculateAsync(input: ScoreInput, childInputs: Record<string, ScoreInput>): Promise<CompositeScoreResult>;
+}
+
+export interface CompositeScoreResult {
+  result: ScoreResult;
+  children: Record<string, ScoreResult>;
+}
+
+export interface PresetMigrationResult {
+  config: ScoreConfig;
+  fromVersion: number | undefined;
+  toVersion: 1;
+  migrated: boolean;
 }
