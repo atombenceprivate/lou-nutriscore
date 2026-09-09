@@ -61,6 +61,64 @@ Use `calculator.explain(input)` as the explicit developer/debug entry point. It
 returns the same stable `ScoreResult` shape as `calculate`, including the
 human-readable explanation and structured per-factor breakdown.
 
+## Batch, comparison and sensitivity
+
+```ts
+const results = calculator.calculateMany(dataset);
+const comparison = calculator.compare(candidateA, candidateB);
+// comparison.scoreDelta and comparison.factors explain what changed.
+
+const analysis = calculator.sensitivity(candidateA, 1);
+// Per source factor: score after +1 / -1, plus deltas from the baseline.
+```
+
+`analyze(input, step)` is an alias for `sensitivity(input, step)`. Derived
+factors created with an `evaluate` callback are reported as unavailable for
+automatic perturbation, rather than producing a misleading result.
+
+## Async and composite models
+
+Use `calculateAsync` when a factor or plugin retrieves data asynchronously:
+
+```ts
+const calculator = createCalculator({
+  schemaVersion: 1,
+  factors: [{ key: "remote", weight: 1, range: { min: 0, max: 10 }, evaluate: async () => 8 }],
+  grades: [{ name: "good", min: 50 }, { name: "low", min: 0 }],
+});
+const result = await calculator.calculateAsync({});
+```
+
+`createCompositeCalculator` makes a child score available as a numeric parent
+factor, enabling deterministic nested models:
+
+```ts
+import { createCalculator, createCompositeCalculator } from "lou-nutriscore";
+
+const child = createCalculator(balancedPreset);
+const parent = createCompositeCalculator(parentConfig, { child });
+const result = parent.calculate({}, { child: { quality: 8, value: 6, risk: 2 } });
+// result.children.child.score is automatically supplied as the parent `child` factor.
+```
+
+## Preset migration
+
+`migratePreset` upgrades known legacy JSON shapes to the current schema and
+returns migration metadata. `importPreset` calls it automatically. Presets
+using the historic `version: 1` field are accepted and converted to
+`schemaVersion: 1`.
+
+## CLI
+
+The package includes a dependency-free CLI after installation:
+
+```bash
+npx lou-nutriscore validate config.json
+npx lou-nutriscore score config.json input.json
+npx lou-nutriscore explain config.json input.json
+npx lou-nutriscore compare config.json first.json second.json
+```
+
 ## Extensions
 
 Factors can have an `evaluate`, `transform` or `normalize` callback. Plugins
@@ -84,6 +142,10 @@ const calculator = createCalculator(balancedPreset, { plugins: [roundScore] });
 import { calculateLou, LOU_DISCLAIMER } from "lou-nutriscore/lou";
 const result = calculateLou({ energy: 9, vibe: 9, chaos: 1 });
 ```
+
+`explainLou(input)` returns the same result together with Lou+-specific,
+playful presentation text. It uses the same serious breakdown engine as the
+core package.
 
 Lou+ is a fan/parody presentation preset, not a nutrition classification and
 not an official product, endorsement, or affiliation. Do not use it for health,
