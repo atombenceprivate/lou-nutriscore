@@ -1,6 +1,6 @@
 import { validateConfig } from "./engine.js";
 import { ScoreConfigError } from "./errors.js";
-import type { ScoreConfig } from "./types.js";
+import type { PresetMigrationResult, ScoreConfig } from "./types.js";
 
 export const balancedPreset: ScoreConfig = {
   schemaVersion: 1,
@@ -25,7 +25,17 @@ export function importPreset(json: string): ScoreConfig {
   let parsed: unknown;
   try { parsed = JSON.parse(json); }
   catch { throw new ScoreConfigError("Preset must be valid JSON."); }
-  if (typeof parsed !== "object" || parsed === null) throw new ScoreConfigError("Preset must be a JSON object.");
-  validateConfig(parsed as ScoreConfig);
-  return parsed as ScoreConfig;
+  return migratePreset(parsed).config;
+}
+
+/** Converts known legacy preset shapes to the current schema without mutating the input. */
+export function migratePreset(preset: unknown): PresetMigrationResult {
+  if (typeof preset !== "object" || preset === null || Array.isArray(preset)) throw new ScoreConfigError("Preset must be a JSON object.");
+  const source = preset as Record<string, unknown>;
+  const fromVersion = typeof source.schemaVersion === "number" ? source.schemaVersion : typeof source.version === "number" ? source.version : undefined;
+  if (fromVersion !== undefined && fromVersion !== 1) throw new ScoreConfigError(`Cannot migrate unsupported schemaVersion ${fromVersion}.`);
+  const config = { ...source, schemaVersion: 1 } as ScoreConfig;
+  delete (config as unknown as Record<string, unknown>).version;
+  validateConfig(config);
+  return { config, fromVersion, toVersion: 1, migrated: fromVersion !== 1 };
 }
