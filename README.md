@@ -172,6 +172,33 @@ metadata without rendering an image. `compareLou()` keeps both structured score
 results and the numeric delta. `generateLouChallenge()` creates a deterministic,
 non-personal mini prompt in English or Hungarian.
 
+## Lou Universe API
+
+The optional Lou entry point also includes explicit, in-memory session support:
+
+```ts
+import { createLouSession, formatLouMarkdown, louProtocol } from "lou-nutriscore/lou";
+const session = createLouSession();
+session.add(result); // no automatic tracking or persistence
+const summary = session.summary();
+```
+
+Use `registerLouCollection()` for namespaced custom achievements,
+`exportLouResult()` / `importLouResult()` for versioned portable snapshots, and
+`formatLouText()`, `formatLouMarkdown()` or `formatLouTerminal()` for display.
+`seededLouMessage(result, seed)` is deterministic. `louProtocol(result)` emits
+a versioned-style, frontend-friendly fan/parody response with playful `200` and
+`503` states.
+
+## Browser, UI and extension SDK
+
+The compiled ESM modules work in modern browsers through a CDN import. See the
+[API reference](docs/API.md) for a browser example. `lou-nutriscore/ui` exports
+the dependency-free `createScoreViewModel()`, while `lou-nutriscore/sdk` exports
+`defineExtension()` and `installExtension()` for public preset/plugin packages.
+Run `node benchmarks/benchmark.mjs` after `npm run build` for the 1k/10k/100k
+batch performance suite.
+
 Lou+ is a fan/parody presentation preset, not a nutrition classification and
 not an official product, endorsement, or affiliation. Do not use it for health,
 medical, dietary, or regulated decisions.
