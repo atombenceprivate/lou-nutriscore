@@ -32,7 +32,7 @@ test("supports custom factor callbacks and an explicit explain API", () => {
 
 test("Lou+ presentation snapshot", () => {
   assert.deepEqual(calculateLou({ energy: 9, vibe: 9, chaos: 1 }).presentation, {
-    title: "LOU+ · 90/100", disclaimer: LOU_DISCLAIMER, narrative: "Energy, vibe and chaos combine into LOU+.",
+    title: "EXTREMELY LOU · 90/100", disclaimer: LOU_DISCLAIMER, narrative: "Energy, vibe and chaos combine into EXTREMELY LOU.", locale: "en", intensity: 90, emoji: "✨",
   });
 });
 
