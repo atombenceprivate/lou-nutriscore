@@ -29,3 +29,4 @@ export function getLouReaction(result: LouResult, tone: LouTone = "default"): st
 export function compareLou(a: ScoreInput, b: ScoreInput) { const first = calculateLou(a), second = calculateLou(b); return { a: first, b: second, winner: second.score > first.score ? "b" : second.score < first.score ? "a" : "tie", delta: second.score - first.score }; }
 export function createLouShareCardData(result: LouResult) { return { title: result.presentation.title, caption: "Purely playful scoring energy.", badges: result.badges, disclaimer: LOU_DISCLAIMER, theme: result.presentation }; }
 export function generateLouChallenge(input: ScoreInput, locale: LouLocale = "en") { return { prompt: locale === "hu" ? "Emeld a vibe faktort 2 ponttal." : "Raise vibe by 2 points.", target: { key: "vibe", delta: 2 }, basedOn: input.vibe ?? 0 }; }
+export * from "./lou-universe.js";
